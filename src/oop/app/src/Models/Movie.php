@@ -67,9 +67,9 @@ class Movie implements MovieInterface
      */
     public function setData(string $title, string $poster, string $description): self
     {
-        $this->title = $title;
-        $this->poster = $poster;
-        $this->description = $description;
+        $this->setTitle($title);
+        $this->setPoster($poster);
+        $this->setDescription($description);
 
         return $this;
     }
