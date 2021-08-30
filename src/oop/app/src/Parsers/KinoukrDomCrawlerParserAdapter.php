@@ -18,6 +18,6 @@ class KinoukrDomCrawlerParserAdapter implements ParserInterface
         $poster = $crawler->filter('.fposter a')->link()->getUri();
         $description = $crawler->filter('.fdesc.full-text')->text();
 
-        return (new Movie())->setData($title, $poster, $description);
+        return new Movie($title, $poster, $description);
     }
 }

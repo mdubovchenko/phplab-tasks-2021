@@ -16,6 +16,6 @@ class FilmixParserStrategy implements ParserInterface
         preg_match('#<img src="(.+?)" class="poster poster-tooltip"#', $siteContent, $poster);
         preg_match('#<div class="full-story">(.+?)</div>#', $siteContent, $description);
 
-        return (new Movie())->setData($title[1], $poster[1], $description[1]);
+        return new Movie($title[1], $poster[1], $description[1]);
     }
 }

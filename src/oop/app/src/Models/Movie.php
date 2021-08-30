@@ -11,6 +11,13 @@ class Movie implements MovieInterface
     /** @var string */
     private $description;
 
+    public function __construct(string $title, string $poster, string $description)
+    {
+        $this->setTitle($title);
+        $this->setPoster($poster);
+        $this->setDescription($description);
+    }
+
     /**
      * @return string
      */
@@ -57,20 +64,5 @@ class Movie implements MovieInterface
     public function setDescription(string $description): void
     {
         $this->description = $description;
-    }
-
-    /**
-     * @param string $title
-     * @param string $poster
-     * @param string $description
-     * @return $this
-     */
-    public function setData(string $title, string $poster, string $description): self
-    {
-        $this->setTitle($title);
-        $this->setPoster($poster);
-        $this->setDescription($description);
-
-        return $this;
     }
 }
