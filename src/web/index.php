@@ -9,17 +9,13 @@ $airports = require './airports.php';
  * and apply filtering by First Airport Name Letter and/or Airport State
  * (see Filtering tasks 1 and 2 below)
  */
+// Filtering by First Airport Name Letter
 if (isset($_GET['filter_by_first_letter'])) {
-    $airports = array_filter($airports, function ($a) {
-        return substr($a['name'], 0, 1) == $_GET['filter_by_first_letter'];
-    });
-    sort($airports);
+    filterByGetParams($airports, $_GET['filter_by_first_letter']);
 }
+// Filtering by Airport State
 if (isset($_GET['filter_by_state'])) {
-    $airports = array_filter($airports, function ($a) {
-        return $a['state'] == $_GET['filter_by_state'];
-    });
-    sort($airports);
+    filterByGetParams($airports, $_GET['filter_by_state']);
 }
 
 // Sorting
@@ -29,9 +25,7 @@ if (isset($_GET['filter_by_state'])) {
  * (see Sorting task below)
  */
 if (isset($_GET['sort'])) {
-    usort($airports, function ($a, $b) {
-       return  $a[$_GET['sort']] <=> $b[$_GET['sort']];
-    });
+   sortByKey($airports);
 }
 
 // Pagination
@@ -40,12 +34,7 @@ if (isset($_GET['sort'])) {
  * and apply pagination logic
  * (see Pagination task below)
  */
-$limit = 5;
-$totalPages = ceil(count($airports) / $limit);
-if (!isset($_GET['page']) || $_GET['page'] > $totalPages) {
-    $_GET['page'] = 1;
-}
-$offset = ($_GET['page'] - 1) * $limit;
+$pagination = paginationParams($airports);
 
 ?>
 <!doctype html>
@@ -116,7 +105,7 @@ $offset = ($_GET['page'] - 1) * $limit;
                i.e. if you have filter_by_first_letter set you can additionally use filter_by_state
         -->
         <?php foreach ($airports as $key => $airport): ?>
-        <?php if ($key >= $offset && $key < ($offset + $limit)): ?>
+        <?php if ($key >= $pagination['offset'] && $key < ($pagination['offset'] + $pagination['limit'])): ?>
         <tr>
             <td><?= $airport['name'] ?></td>
             <td><?= $airport['code'] ?></td>
@@ -141,7 +130,7 @@ $offset = ($_GET['page'] - 1) * $limit;
     -->
     <nav aria-label="Navigation">
         <ul class="nav nav-pills nav-justified justify-content-center ">
-            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <?php for ($i = 1; $i <= $pagination['totalPages']; $i++): ?>
             <li class="page-item <?= $_GET['page'] == $i ? 'active' : ''; ?>"><a class="page-link" href="?<?= http_build_query(array_merge( $_GET, ['page' => $i])); ?>"><?= $i ?></a></li>
             <?php endfor; ?>
         </ul>
