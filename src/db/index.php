@@ -2,13 +2,16 @@
 /**
  * Connect to DB
  */
+/** @var \PDO $pdo */
+require_once './pdo_ini.php';
+require_once './functions.php';
 
 /**
  * SELECT the list of unique first letters using https://www.w3resource.com/mysql/string-functions/mysql-left-function.php
  * and https://www.w3resource.com/sql/select-statement/queries-with-distinct.php
  * and set the result to $uniqueFirstLetters variable
  */
-$uniqueFirstLetters = ['A', 'B', 'C'];
+$uniqueFirstLetters = getUniqueFirstLetters($pdo);
 
 // Filtering
 /**
@@ -47,7 +50,7 @@ $uniqueFirstLetters = ['A', 'B', 'C'];
  *
  * For city_name and state_name fields you can use alias https://www.mysqltutorial.org/mysql-alias/
  */
-$airports = [];
+$airports = getAllData($pdo);
 ?>
 <!doctype html>
 <html lang="en">
@@ -78,10 +81,12 @@ $airports = [];
         Filter by first letter:
 
         <?php foreach ($uniqueFirstLetters as $letter): ?>
-            <a href="#"><?= $letter ?></a>
+            <a href="?<?= http_build_query(array_merge($_GET, ['filter_by_first_letter' => $letter], ['page' => 1])); ?>">
+                <?= $letter ?>
+            </a>
         <?php endforeach; ?>
 
-        <a href="/" class="float-right">Reset all filters</a>
+        <a href="/src/db/" class="float-right">Reset all filters</a>
     </div>
 
     <!--
@@ -97,10 +102,10 @@ $airports = [];
     <table class="table">
         <thead>
         <tr>
-            <th scope="col"><a href="#">Name</a></th>
-            <th scope="col"><a href="#">Code</a></th>
-            <th scope="col"><a href="#">State</a></th>
-            <th scope="col"><a href="#">City</a></th>
+            <th scope="col"><a href="?<?= http_build_query(array_merge($_GET, ['sort' => 'name'])); ?>">Name</a></th>
+            <th scope="col"><a href="?<?= http_build_query(array_merge($_GET, ['sort' => 'code'])); ?>">Code</a></th>
+            <th scope="col"><a href="?<?= http_build_query(array_merge($_GET, ['sort' => 'state_name'])); ?>">State</a></th>
+            <th scope="col"><a href="?<?= http_build_query(array_merge($_GET, ['sort' => 'city_name'])); ?>">City</a></th>
             <th scope="col">Address</th>
             <th scope="col">Timezone</th>
         </tr>
@@ -120,7 +125,9 @@ $airports = [];
         <tr>
             <td><?= $airport['name'] ?></td>
             <td><?= $airport['code'] ?></td>
-            <td><a href="#"><?= $airport['state_name'] ?></a></td>
+            <td><a href="?<?= http_build_query(array_merge($_GET, ['filter_by_state' => $airport['state_name']], ['page' => 1])); ?>">
+                    <?= $airport['state_name'] ?>
+                </a></td>
             <td><?= $airport['city_name'] ?></td>
             <td><?= $airport['address'] ?></td>
             <td><?= $airport['timezone'] ?></td>
@@ -139,12 +146,16 @@ $airports = [];
          - when you apply pagination - all filters and sorting are not reset
     -->
     <nav aria-label="Navigation">
-        <ul class="pagination justify-content-center">
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <ul class="nav nav-pills nav-justified justify-content-center ">
+            <?php for ($i = 1; $i <= $airports['totalPages']; $i++): ?>
+                <li class="page-item <?= $_GET['page'] == $i ? 'active' : ''; ?>">
+                    <a class="page-link" href="?<?= http_build_query(array_merge( $_GET, ['page' => $i])); ?>">
+                        <?= $i ?>
+                    </a></li>
+            <?php endfor; ?>
         </ul>
     </nav>
 
 </main>
 </html>
+
